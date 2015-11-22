@@ -6,9 +6,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import AppMain from './appmain';
 import Slides from './slides';
+import Footer from './footer'
 require('./base.less');
 
 let container = document.getElementById('container');
+let footer = document.getElementById('footer');
 
 if (!localStorage.getItem('basic')) {
     let main = () => {
@@ -29,3 +31,8 @@ if (!localStorage.getItem('basic')) {
         container
     );
 }
+
+ReactDOM.render(
+    <Footer/>,
+    footer
+);
