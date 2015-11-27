@@ -6,7 +6,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 const FlatButton = require('material-ui/lib/flat-button');
-const FontIcon = require('material-ui/lib/font-icon');
 
 export default class Footer extends React.Component {
     render() {

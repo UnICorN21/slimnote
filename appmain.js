@@ -10,14 +10,13 @@ require('./appmain.less');
 const DatePicker = require('material-ui/lib/date-picker/date-picker');
 const TextField = require('material-ui/lib/text-field');
 
-// TODO: add code to check whether the environment supports tap or not
 let injectTapEventPlugin = require('react-tap-event-plugin');
 injectTapEventPlugin();
 
 export default class AppMain extends React.Component {
-    static displayName = 'Main';
     constructor(props) {
         super(props);
+        this.displayName = 'Main';
         let that = this;
         this._options = {
             showTooltips: false,
