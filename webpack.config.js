@@ -4,17 +4,24 @@
  */
 var webpack = require('webpack');
 
+var env = ' debug'; // Will be set in the make process
+
 module.exports = {
     entry: {
-        bundle: [
-            //'webpack-dev-server/client?http://localhost:3000',
-            //'webpack/hot/only-dev-server',
-            './app.js'
-        ]
+        app: (function() {
+            var ret = [];
+            if ('debug' === env) {
+                ret.push('webpack-dev-server/client?http://localhost:3000');
+                ret.push('webpack/hot/only-dev-server');
+            }
+            ret.push('./app.js');
+            return ret;
+        })()
     },
     output: {
-        path: __dirname,
-        filename: "[name].js"
+        path: __dirname + '/build',
+        filename: "[name].bundle.js",
+        chunkFilename: "[id].bundle-[chunkhash].js"
     },
     module: {
         loaders: [
@@ -24,19 +31,21 @@ module.exports = {
             },
             {
                 test: /\.jsx?$/,
-                loader: 'babel',
+                loader: 'source-map-loader!babel',
                 exclude: /node_modules/
             }
         ]
     },
-    externals: {
-        "child_process": "child_process",
-        "remote": "remote"
-    },
-    plugins: [
-        new webpack.optimize.DedupePlugin(),
-        //new webpack.HotModuleReplacementPlugin(),
-        new webpack.optimize.UglifyJsPlugin(),
-        new webpack.NoErrorsPlugin()
-    ]
+    plugins: (function() {
+        var ret = [
+            new webpack.NoErrorsPlugin()
+        ];
+        if ('debug' === env) {
+            ret.push(new webpack.HotModuleReplacementPlugin());
+        } else {
+            ret.push(new webpack.optimize.DedupePlugin());
+            ret.push(new webpack.optimize.UglifyJsPlugin());
+        }
+        return ret;
+    })()
 };

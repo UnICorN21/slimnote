@@ -27,11 +27,10 @@ if (!localStorage.getItem('basic')) {
     );
 } else {
     ReactDOM.render(
-        <AppMain/>,
-        container
+            <AppMain/>,
+            container
     );
 }
-
 ReactDOM.render(
     <Footer/>,
     footer

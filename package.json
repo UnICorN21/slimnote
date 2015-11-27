@@ -20,11 +20,13 @@
     "react-chartjs": "^0.6.0",
     "react-dom": "^0.14.2",
     "react-tap-event-plugin": "^0.2.1",
+    "source-map-loader": "^0.1.5",
     "style-loader": "^0.13.0",
     "webpack": "^1.12.6",
     "webpack-dev-server": "^1.12.1"
   },
   "scripts": {
-    "debug": "webpack"
+    "debug": "make debug",
+    "release": "make release"
   }
 }
