@@ -13,6 +13,7 @@
       margin: 10px auto;
       opacity: 0;
       transition: opacity 500ms ease-in-out;
+      &.always-shown { opacity: 1 !important; }
       &:hover {
         opacity: 1;
         transition-delay: 500ms;
@@ -20,7 +21,14 @@
     }
   }
 
-  .interactive button {
-    float: right;
+  .interactive {
+    opacity: 1;
+    transition: opacity 250ms ease-in-out;
+    &.hidden {
+      opacity: 0;
+    }
+    button {
+      float: right;
+    }
   }
 }

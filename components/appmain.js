@@ -16,28 +16,137 @@ injectTapEventPlugin();
 
 export default class AppMain extends React.Component {
     static displayName = 'Main';
-    static current = () => {
+    static current() {
         let date = new Date();
-        return `${date.getFullYear()}.${date.getMonth() + 1}`;
-    };
+        return `${date.getFullYear()}-${date.getMonth() + 1}`;
+    }
+    static operateCoord(coord, type) {
+        let ret = coord.split('-');
+        switch(type) {
+            case 'MINUS': {
+                if (--ret[1] < 0) {
+                    ret[1] = '12';
+                    --ret[0];
+                } else ret[1] += '';
+                break;
+            }
+            case 'ADD': {
+                if (++ret[1] > 12) {
+                    ret[1] = '1';
+                    ++ret[0];
+                } else ret[1] += '';
+                break;
+            }
+        }
+        if (ret[1].length <= 1) ret[1] = '0' + ret[1];
+        return ret.join('-');
+    }
     constructor(props) {
         super(props);
-        this._showCoord = null; // {string} Format like YYYY-MM.
-        this._showData = null; // {array} Its content will be draw on canvas.
-        this._options = {
-            showTooltips: false,
-            onAnimationComplete: () => {
-                let canvas = ReactDOM.findDOMNode(this.refs.graph);
-                let ctx = canvas.getContext('2d');
-                let text = AppMain.current();
-                let textWidth = ctx.measureText(text).width;
-                ctx.fillStyle = "#eee";
-                ctx.font = "100px 'Slabo 27px'";
-                ctx.textBaseline = 'middle';
-                ctx.fillText(text, (canvas.width / 2) - (textWidth / 2), canvas.height / 2);
+        this.state = {
+            input: {
+                date: null,
+                weight: null
+            },
+            history: null,
+            coord: AppMain.current(),
+            data: {
+                labels: [],
+                datasets: [ [], [] ]
             }
-        };
-        this._commons = [
+        }
+    }
+
+    /**
+     * The only method to update the value of `this.state.data`.
+     * @param data {array}
+     * @param coord {string}
+     */
+    makeChange(data = this._raw, coord = AppMain.current()) {
+        this.setState({
+            coord: coord,
+            data: {
+                labels: (() => {
+                    return data.map(o => { return o.date; });
+                })(),
+                datasets: [
+                    (() => { return data.map(o => { return o.weight; })})(),
+                    (() => { return data.map(o => { return this._target; })})()
+                ]
+            }
+        });
+        setTimeout(() => {
+            debug('New state data:', this.state.data);
+        }, 0);
+    }
+    componentDidMount() {
+        // `raw` is an array of object like `{date: xx, weight: xx}`.
+        this._raw = JSON.parse(localStorage.getItem('data'));
+        this._target = JSON.parse(localStorage.getItem('basic')).target;
+        this.setState({
+            history: JSON.parse(localStorage.getItem('history') || '{}')
+        });
+        setTimeout(() => {
+            debug('history is', this.state.history);
+            if ((new Date()).getDate() === 1) {
+                let label = AppMain.operateCoord(AppMain.current(), 'MINUS');
+                this.setState({
+                    history: Object.assign({}, this.state.history, function() {
+                        var ret = {};
+                        ret[label] = this._raw;
+                        return ret;
+                    }.bind(this))
+                });
+                setTimeout(() => {
+                    this._raw.clear();
+                    this.makeChange();
+                }, 0);
+            } else this.makeChange();
+        }, 0);
+    }
+    componentWillUnmount() {
+        localStorage.setItem('data', JSON.stringify(this._raw));
+        localStorage.setItem('history', JSON.stringify(this.state.history));
+    }
+    clearData() {
+        this._raw = [];
+        this.makeChange();
+    }
+    historyMin() {
+        if (!this.state.history) {
+            debug('Call `historyMin` on a null history');
+            return '9999-99';
+        }
+        return Array.prototype.sort.call(Object.keys(this.state.history))[0];
+    }
+    handleClick() {
+        let date = (() => {
+            let date = this.refs.date.getDate();
+            return `${date.getDate()}`;
+        })(),
+            weight = this.refs.weight.getValue();
+        this._raw.push({date: date, weight: weight});
+        this.makeChange();
+        localStorage.setItem('data', JSON.stringify(this._raw));
+    }
+
+    handleLeftClick() {
+        // This op should be valid if it could be toggled.
+        let targetCoord = AppMain.operateCoord(this.state.coord, 'MINUS');
+        debug('Set coord to', targetCoord);
+        this.makeChange(this.state.history[targetCoord], targetCoord);
+    }
+    handleRightClick() {
+        // This op should be valid if it could be toggled.
+        let targetCoord = AppMain.operateCoord(this.state.coord, 'ADD');
+        debug('Set coord to', targetCoord);
+        this.makeChange(this.state.history[targetCoord], targetCoord);
+    }
+    render() {
+        let leftArrowDisabled = this.historyMin() >= this.state.coord;
+        let rightArrowDisabled = AppMain.current() <= this.state.coord;
+        let clearDisabled = AppMain.current() !== this.state.coord;
+        const commons = [
             {
                 label: "my slim note",
                 fillColor: "rgba(220,220,220,0.2)",
@@ -57,82 +166,23 @@ export default class AppMain extends React.Component {
                 pointHighlightStroke: "rgba(151,187,205,1)"
             }
         ];
-        this.state = {
-            input: {
-                date: null,
-                weight: null
-            },
-            data: {
-                labels: [],
-                datasets: [ [], [] ]
+        const options = {
+            showTooltips: false,
+            onAnimationComplete: () => {
+                let canvas = ReactDOM.findDOMNode(this.refs.graph);
+                let ctx = canvas.getContext('2d');
+                let text = this.state.coord;
+                let textWidth = ctx.measureText(text).width;
+                ctx.fillStyle = "#eee";
+                ctx.font = "100px 'Slabo 27px'";
+                ctx.textBaseline = 'middle';
+                ctx.fillText(text, (canvas.width / 2) - (textWidth / 2), canvas.height / 2);
             }
-        }
-    }
-    makeChange() {
-        this.setState({data: {
-            labels: (() => {
-                return this._showData.map(o => { return o.date.split('-')[2]; });
-            })(),
-            datasets: [
-                (() => { return this._showData.map(o => { return o.weight; })})(),
-                (() => { return this._showData.map(o => { return this._target; })})()
-            ]
-        }});
-        setTimeout(() => {
-            debug('New state data:', this.state.data);
-        }, 0);
-    }
-    componentDidMount() {
-        // `raw` is an array of object like `{date: xxxx-xx-xx, weight: xx}`.
-        this._raw = JSON.parse(localStorage.getItem('data'));
-        this._target = JSON.parse(localStorage.getItem('basic')).target;
-        // TODO: fix bugs when a new month starts.
-        this._showCoord = AppMain.current();
-        this._showData = this._raw;
-        this.makeChange();
-        this._history = JSON.parse(localStorage.getItem('history') || '{}');
-    }
-    componentWillUnmount() {
-        localStorage.setItem('data', JSON.stringify(this._raw));
-        localStorage.setItem('history', JSON.stringify(this._history));
-    }
-    clearData() {
-        this._raw = [];
-        this._showData = [];
-        this.makeChange();
-    }
-    historyMin() {
-        if (!this._history || !this._history.keys) {
-            debug('Call `historyMin` on a null _history');
-            return null;
-        }
-        return Array.prototype.sort.call(this._history.keys)[0];
-    }
-    handleClick() {
-        let date = (() => {
-            let date = this.refs.date.getDate();
-            return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-        })(),
-            weight = this.refs.weight.getValue();
-        this._raw.push({date: date, weight: weight});
-        this._showData = this._raw;
-        this.makeChange();
-        localStorage.setItem('data', JSON.stringify(this._raw));
-    }
-    handleLeftClick() {
-        // TODO
-    }
-    handleRightClick() {
-        // TODO
-    }
-    render() {
-        let leftArrowDisabled = this.historyMin() >= this._showCoord;
-        let rightArrowDisabled = AppMain.current() <= this._showCoord;
-        let clearDisabled = this._showData !== this._raw;
+        };
         return (
             <div className="app-main">
                 <div className="header-container">
-                    <div className="header-buttons">
+                    <div className={`header-buttons ${AppMain.current() === this.state.coord ? '' : 'always-shown'}`}>
                         <button className="mdl-button mdl-js-button mdl-js-ripple-effect"
                                 disabled={leftArrowDisabled} onClick={this.handleLeftClick.bind(this)}>
                             <i className="material-icons">keyboard_arrow_left</i>
@@ -147,15 +197,15 @@ export default class AppMain extends React.Component {
                         </button>
                     </div>
                 </div>
-                <LineChart data={this.state.data} commons={this._commons} options={this._options} width={800} height={600} ref="graph"/>
-                <div className="mdl-grid interactive">
-                    <div className="mdl-cell mdl-cell--4-col">
+                <LineChart data={this.state.data} commons={commons} options={options} width={800} height={600} ref="graph"/>
+                <div className={`mdl-grid interactive ${AppMain.current() === this.state.coord ? '' : 'hidden'}`}>
+                    <div className="mdl-cell mdl-cell--4-col" >
                         <DatePicker floatingLabelText="Date" ref="date"/>
                     </div>
                     <div className="mdl-cell mdl-cell--4-col">
                         <TextField floatingLabelText="Weight" type="number" ref="weight"/>
                     </div>
-                    <div className="mdl-cell mdl-cell--4-col mdl-cell--bottom" disabled={clearDisabled}>
+                    <div className="mdl-cell mdl-cell--4-col mdl-cell--bottom">
                         <button className="mdl-button mdl-js-button mdl-js-ripple-effect" onClick={this.handleClick.bind(this)}>
                             <i className="material-icons">add</i>
                         </button>
