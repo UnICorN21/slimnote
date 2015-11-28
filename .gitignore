@@ -25,6 +25,7 @@ Temporary Items
 .apdisk
 
 # Additions
+.idea
 build
 node_modules
 slimnote.iml
