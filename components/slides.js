@@ -5,12 +5,13 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-require('./slides.less');
+require('./styles/slides.less');
 
 const SelectField = require('material-ui/lib/select-field');
 const TextField = require('material-ui/lib/text-field');
 
 class Progress extends React.Component {
+    static displayName = 'Progress';
     render() {
         return (
             <div className="progress">
@@ -21,6 +22,7 @@ class Progress extends React.Component {
 }
 
 class Motion extends React.Component {
+    static displayName = 'Motion';
     render() {
         let clazz = 'motion';
         if (this.props.addition && this.props.state !== 'current') clazz += ` ${this.props.addition}`;
@@ -35,9 +37,9 @@ class Motion extends React.Component {
 }
 
 export default class Slides extends React.Component {
+    static displayName = 'Slides';
     constructor(props) {
         super(props);
-        this.displayName = 'Slides';
         this.state = {
             steps: 0,
             gender: null,

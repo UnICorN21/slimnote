@@ -4,7 +4,7 @@
  */
 var webpack = require('webpack');
 
-var env = ' debug'; // Will be set in the make process
+var env = ' release'; // Will be set in the make process
 
 module.exports = {
     entry: {
@@ -21,7 +21,7 @@ module.exports = {
     output: {
         path: __dirname + '/build',
         filename: "[name].bundle.js",
-        chunkFilename: "[id].bundle-[chunkhash].js"
+        chunkFilename: "[chunkhash].bundle.js"
     },
     module: {
         loaders: [

@@ -4,9 +4,9 @@
  */
 import React from 'react';
 import ReactDOM from 'react-dom';
-import AppMain from './appmain';
-import Slides from './slides';
-import Footer from './footer'
+import AppMain from './components/appmain';
+import Slides from './components/slides';
+import Footer from './components/footer'
 require('./base.less');
 
 let container = document.getElementById('container');
