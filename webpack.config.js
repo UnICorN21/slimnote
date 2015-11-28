@@ -4,7 +4,7 @@
  */
 var webpack = require('webpack');
 
-var env = ' debug'; // Will be set in the make process
+var env = ' release'; // Will be set in the make process
 
 module.exports = {
     entry: {
