@@ -113,7 +113,7 @@ export default class AppMain extends React.Component {
         this.makeChange();
     }
     historyMin() {
-        if (!this.state.history) {
+        if (!this.state.history || Object.keys(this.state.history).length === 0) {
             debug('Call `historyMin` on a null history');
             return '9999-99';
         }
@@ -172,11 +172,11 @@ export default class AppMain extends React.Component {
                 let canvas = ReactDOM.findDOMNode(this.refs.graph);
                 let ctx = canvas.getContext('2d');
                 let text = this.state.coord;
-                let textWidth = ctx.measureText(text).width;
                 ctx.fillStyle = "#eee";
                 ctx.font = "100px 'Slabo 27px'";
                 ctx.textBaseline = 'middle';
-                ctx.fillText(text, (canvas.width / 2) - (textWidth / 2), canvas.height / 2);
+                let textWidth = ctx.measureText(text).width;
+                ctx.fillText(text, canvas.width / 2 + textWidth/2 , canvas.height / 2);
             }
         };
         return (
