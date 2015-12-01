@@ -63,20 +63,21 @@ export default class AppMain extends React.Component {
      * @param coord {string}
      */
     makeChange(data = this._raw, coord = AppMain.current()) {
+        debug(data, coord);
         this.setState({
             coord: coord,
             data: {
                 labels: (() => {
-                    return data.map(o => { return o.date; });
+                    return data.length ? data.map(o => { return o.date; }) : [];
                 })(),
                 datasets: [
-                    (() => { return data.map(o => { return o.weight; })})(),
-                    (() => { return data.map(o => { return this._target; })})()
+                    (() => { return data.length ? data.map(o => { return o.weight; }) : []; })(),
+                    (() => { return data.length ? data.map(o => { return this._target; }) : []; })()
                 ]
             }
         });
         setTimeout(() => {
-            debug('New state data:', this.state.data);
+            debug('New state:', this.state);
         }, 0);
     }
     componentDidMount() {
@@ -88,7 +89,7 @@ export default class AppMain extends React.Component {
         });
         setTimeout(() => {
             debug('history is', this.state.history);
-            if ((new Date()).getDate() === 1) {
+            if ((new Date()).getDate() === 1 && localStorage.getItem('reset') !== '1') {
                 let label = AppMain.operateCoord(AppMain.current(), 'MINUS');
                 this.setState({
                     history: Object.assign({}, this.state.history, function() {
@@ -98,8 +99,10 @@ export default class AppMain extends React.Component {
                     }.bind(this))
                 });
                 setTimeout(() => {
-                    this._raw.clear();
+                    this._raw = [];
                     this.makeChange();
+                    localStorage.setItem('data', JSON.stringify(this._raw));
+                    localStorage.setItem('reset', 1);
                 }, 0);
             } else this.makeChange();
         }, 0);
