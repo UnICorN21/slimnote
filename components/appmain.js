@@ -102,6 +102,7 @@ export default class AppMain extends React.Component {
                     this._raw = [];
                     this.makeChange();
                     localStorage.setItem('data', JSON.stringify(this._raw));
+                    localStorage.setItem('history', JSON.stringify(this.state.history));
                     localStorage.setItem('reset', 1);
                 }, 0);
             } else this.makeChange();
