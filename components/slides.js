@@ -5,7 +5,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-require('./styles/slides.less');
+require('./styles/slides.scss');
 
 const SelectField = require('material-ui/lib/select-field');
 const TextField = require('material-ui/lib/text-field');

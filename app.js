@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom';
 import AppMain from './components/appmain';
 import Slides from './components/slides';
 import Footer from './components/footer'
-require('./base.less');
+require('./base.scss');
 
 let container = document.getElementById('container');
 let footer = document.getElementById('footer');

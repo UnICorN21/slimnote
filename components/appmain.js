@@ -6,7 +6,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import LineChart from './linechart';
 let debug = require('debug')('slimnote:appmain');
-require('./styles/appmain.less');
+require('./styles/appmain.scss');
 
 const DatePicker = require('material-ui/lib/date-picker/date-picker');
 const TextField = require('material-ui/lib/text-field');
@@ -123,17 +123,30 @@ export default class AppMain extends React.Component {
         }
         return Array.prototype.sort.call(Object.keys(this.state.history))[0];
     }
+    validate(d, w) {
+        // check whether we have both values currently.
+        // TODO: add prompt windows with proper info.
+        var date = parseInt(d), weight = parseFloat(w);
+        // both are valid numbers.
+        if (isNaN(date) || isNaN(weight)) return false; 
+        // date should greater than the first point at least.
+        if (date <= parseInt(this.state.data.labels[0].split('-')[2])) return false;
+        // weight should be in the (0.8 * target, 150].
+        if (weight >= 150 || weight < this._target * 0.8) return false;
+        return true;
+    }
     handleClick() {
         let date = (() => {
             let date = this.refs.date.getDate();
             return `${date.getDate()}`;
         })(),
             weight = this.refs.weight.getValue();
-        this._raw.push({date: date, weight: weight});
-        this.makeChange();
-        localStorage.setItem('data', JSON.stringify(this._raw));
+        if (this.validate(date, weight)) {
+            this._raw.push({date: date, weight: weight});
+            this.makeChange();
+            localStorage.setItem('data', JSON.stringify(this._raw));
+        }
     }
-
     handleLeftClick() {
         // This op should be valid if it could be toggled.
         let targetCoord = AppMain.operateCoord(this.state.coord, 'MINUS');

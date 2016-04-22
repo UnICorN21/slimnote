@@ -1,3 +1,8 @@
+@mixin calc($property, $expression) {
+  #{$property}: -webkit-calc(#{$expression});
+  #{$property}: calc(#{$expression});
+}
+
 .mdl-grid {
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -13,11 +18,11 @@
 .mdl-cell {
   margin: 8px;
   box-sizing: border-box;
-  width: calc(~"33.3333333333% - 16px");
+  @include calc(width, "33.3333333333% - 16px");
 }
 
 .mdl-cell--4-col {
-  width: calc(~"33.3333333333% - 16px");
+  @include calc(width, "33.3333333333% - 16px");
 }
 
 .mdl-cell--bottom {
@@ -139,8 +144,8 @@
 
 html, body, #container {
   margin: 0;
-  height: calc(~"100% - 8px");
   color: rgba(0, 0, 0, .87);
+  @include calc(height, "100% - 8px");
 
   footer {
     position: absolute;

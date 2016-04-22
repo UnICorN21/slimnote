@@ -3,8 +3,9 @@
  * Created by Huxley on 11/18/15.
  */
 var webpack = require('webpack');
+var autoprefixer = require('autoprefixer');
 
-var env = ' release'; // Will be set in the make process
+var env = ' debug'; // Will be set in the make process
 
 module.exports = {
     entry: {
@@ -26,8 +27,8 @@ module.exports = {
     module: {
         loaders: [
             {
-                test: /\.less$/,
-                loader: "style!css!autoprefixer!less"
+                test: /\.scss$/,
+                loader: "style!css!postcss-loader!sass"
             },
             {
                 test: /\.jsx?$/,
@@ -35,6 +36,9 @@ module.exports = {
                 exclude: /node_modules/
             }
         ]
+    },
+    postcss: function() {
+        return [autoprefixer];
     },
     plugins: (function() {
         var ret = [
