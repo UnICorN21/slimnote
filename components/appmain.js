@@ -166,35 +166,51 @@ export default class AppMain extends React.Component {
         const commons = [
             {
                 label: "my slim note",
-                fillColor: "rgba(220,220,220,0.2)",
-                strokeColor: "rgba(220,220,220,1)",
-                pointColor: "rgba(220,220,220,1)",
-                pointStrokeColor: "#fff",
-                pointHighlightFill: "#fff",
-                pointHighlightStroke: "rgba(220,220,220,1)"
+                fill: true,
+                backgroundColor: "rgba(255,205,86,0.4)",
+                borderColor: "rgba(255,205,86,1)",
+                pointBorderColor: "rgba(255,205,86,1)",
+                pointBackgroundColor: "#fff",
             },
             {
                 label: "target",
-                fillColor: "rgba(151,187,205,0.2)",
-                strokeColor: "rgba(151,187,205,1)",
-                pointColor: "rgba(151,187,205,1)",
-                pointStrokeColor: "#fff",
-                pointHighlightFill: "#fff",
-                pointHighlightStroke: "rgba(151,187,205,1)"
+                backgroundColor: "rgba(75,192,192,0.4)",
+                borderColor: "rgba(75,192,192,1)",
+                pointBorderColor: "rgba(75,192,192,0.4)",
+                pointBackgroundColor: "#fff",
+                pointBorderWidth: 1,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: "rgba(255,205,86,1)",
+                pointHoverBorderColor: "rgba(255,205,86,1)",
+                pointHoverBorderWidth: 2,
             }
         ];
         const options = {
-            showTooltips: false,
-            onAnimationComplete: () => {
-                let canvas = ReactDOM.findDOMNode(this.refs.graph);
-                let ctx = canvas.getContext('2d');
-                let text = this.state.coord;
-                ctx.fillStyle = "#eee";
-                ctx.font = "100px 'Slabo 27px'";
-                ctx.textBaseline = 'middle';
-                let textWidth = ctx.measureText(text).width;
-                ctx.fillText(text, canvas.width / 2 + textWidth/2 , canvas.height / 2);
-            }
+            legend: {
+                display: false,
+            },
+            tooltips: {
+                callbacks: {
+                    title: function(tooltipItem, data) {
+                        return `Date: ${tooltipItem[0].xLabel}`;
+                    },
+                    label: function(tooltipItem, data) {
+                        return `Weight: ${tooltipItem.yLabel}kg`;
+                    },
+                }
+            },
+            animation: {
+                onComplete: () => {
+                    let canvas = ReactDOM.findDOMNode(this.refs.graph);
+                    let ctx = canvas.getContext('2d');
+                    let text = this.state.coord;
+                    ctx.fillStyle = "#eee";
+                    ctx.font = "100px 'Slabo 27px'";
+                    ctx.textBaseline = 'middle';
+                    let textWidth = ctx.measureText(text).width;
+                    ctx.fillText(text, canvas.width / 2 - textWidth / 2, canvas.height / 2);
+                }
+            },
         };
         return (
             <div className="app-main">
