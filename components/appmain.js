@@ -207,10 +207,11 @@ export default class AppMain extends React.Component {
                     ctx.fillStyle = "#eee";
                     ctx.font = "100px 'Slabo 27px'";
                     ctx.textBaseline = 'middle';
-                    let textWidth = ctx.measureText(text).width;
+                    let textWidth = ctx.measureText(text).width; 
                     ctx.fillText(text, canvas.width / 2 - textWidth / 2, canvas.height / 2);
-                }
-            },
+                },
+            }
+
         };
         return (
             <div className="app-main">

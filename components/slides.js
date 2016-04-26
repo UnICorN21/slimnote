@@ -8,6 +8,7 @@ import ReactDOM from 'react-dom';
 require('./styles/slides.scss');
 
 const SelectField = require('material-ui/lib/select-field');
+const MenuItem = require('material-ui/lib/menus/menu-item');
 const TextField = require('material-ui/lib/text-field');
 
 class Progress extends React.Component {
@@ -47,8 +48,8 @@ export default class Slides extends React.Component {
             target: null
         };
     }
-    _handleGenderChange(name, event) {
-        this.setState({ gender: event.target.value });
+    _handleGenderChange(event, index, value) {
+        this.setState({ gender: value });
     }
     _handleCurrentChange() {
         this.setState({ current: this.refs.current.getValue() });
@@ -107,9 +108,10 @@ export default class Slides extends React.Component {
                 to: 'top',
                 addition: 'scale',
                 content: <SelectField floatingLabelText="Your gender"
-                                      value={this.state.gender}
-                                      onChange={this._handleGenderChange.bind(this, 'gender')}
-                                      menuItems={genders}/>
+                    value={this.state.gender} onChange={this._handleGenderChange.bind(this)}>
+                    <MenuItem value='male' primaryText='Male'/>
+                    <MenuItem value='female' primaryText='Female'/>
+                </SelectField>
             },
             {
                 from: 'bottom',

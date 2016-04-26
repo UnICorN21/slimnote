@@ -77,7 +77,6 @@ export default class LineChart extends React.Component {
             this._chart.data.datasets = this.state.data.datasets;
             this._chart.data.labels = this.state.data.labels;
             this._chart.update();
-            this._chart.render();
         });
     }
 
