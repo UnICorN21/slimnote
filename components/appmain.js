@@ -72,7 +72,7 @@ export default class AppMain extends React.Component {
                 })(),
                 datasets: [
                     (() => { return data.length ? data.map(o => { return o.weight; }) : []; })(),
-                    (() => { return data.length ? data.map(o => { return this._target; }) : []; })()
+                    (() => { return data.length ? data.map(o => { return this._basic.target; }) : []; })()
                 ]
             }
         });
@@ -143,7 +143,7 @@ export default class AppMain extends React.Component {
             return !(alists[0] >= blists[0] && alists[1] >= blists[1] && alists[2] >= blists[2]);
         }(date, this._basic.startDate)) return false;
         // weight should be in the (0.8 * target, 150].
-        if (weight >= 150 || weight < this._basic._target * 0.8) return false;
+        if (weight >= 150 || weight < this._basic.target * 0.8) return false;
         return true;
     }
     handleClick() {
