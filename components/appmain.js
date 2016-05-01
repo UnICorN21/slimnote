@@ -83,21 +83,19 @@ export default class AppMain extends React.Component {
     componentDidMount() {
         // `raw` is an array of object like `{date: xx, weight: xx}`.
         this._raw = JSON.parse(localStorage.getItem('data'));
-        this._target = JSON.parse(localStorage.getItem('basic')).target;
+        this._basic = JSON.parse(localStorage.getItem('basic'));
         this.setState({
             history: JSON.parse(localStorage.getItem('history') || '{}')
         });
         setTimeout(() => {
             debug('history is', this.state.history);
-            if ((new Date()).getDate() === 1 && localStorage.getItem('reset') !== '1') {
+            var date = new Date();
+            if (date.getDate() === 1 && localStorage.getItem('reset') !== '1') {
                 let label = AppMain.operateCoord(AppMain.current(), 'MINUS');
-                this.setState({
-                    history: Object.assign({}, this.state.history, function() {
-                        var ret = {};
-                        ret[label] = this._raw;
-                        return ret;
-                    }.bind(this))
-                });
+                debug('label is', label);
+                var newHistory = this.state.history;
+                newHistory[label] = this._raw;
+                this.setState({ history: newHistory });
                 setTimeout(() => {
                     this._raw = [];
                     this.makeChange();
@@ -105,7 +103,12 @@ export default class AppMain extends React.Component {
                     localStorage.setItem('history', JSON.stringify(this.state.history));
                     localStorage.setItem('reset', 1);
                 }, 0);
-            } else this.makeChange();
+            } else {
+                if (date.getDate() !== 1) {
+                    localStorage.setItem('reset', 0);
+                } 
+                this.makeChange();
+            }
         }, 0);
     }
     componentWillUnmount() {
@@ -124,15 +127,23 @@ export default class AppMain extends React.Component {
         return Array.prototype.sort.call(Object.keys(this.state.history))[0];
     }
     validate(d, w) {
+        // check data validation firstly.
+        if (d.length == 0 || w.length == 0) return false; 
         // check whether we have both values currently.
         // TODO: add prompt windows with proper info.
-        var date = parseInt(d), weight = parseFloat(w);
-        // both are valid numbers.
-        if (isNaN(date) || isNaN(weight)) return false; 
+        var date = `${AppMain.current()}-${d}`, weight = parseFloat(w);
         // date should greater than the first point at least.
-        if (date <= parseInt(this.state.data.labels[0].split('-')[2])) return false;
+        if (function(a, b) {
+            var alists = a.split('-').map((v) => { return parseInt(v); }), 
+                blists = b.split('-').map((v) => { return parseInt(v); });
+            if (alists.length < 3 || blists.length < 3) {
+                debug('met an illegal date format in', a, b);
+                return false;
+            }
+            return !(alists[0] >= blists[0] && alists[1] >= blists[1] && alists[2] >= blists[2]);
+        }(date, this._basic.startDate)) return false;
         // weight should be in the (0.8 * target, 150].
-        if (weight >= 150 || weight < this._target * 0.8) return false;
+        if (weight >= 150 || weight < this._basic._target * 0.8) return false;
         return true;
     }
     handleClick() {

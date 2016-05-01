@@ -5,6 +5,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import AppMain from './appmain'
 require('./styles/slides.scss');
 
 const SelectField = require('material-ui/lib/select-field');
@@ -45,7 +46,11 @@ export default class Slides extends React.Component {
             steps: 0,
             gender: null,
             current: null,
-            target: null
+            target: null,
+            startDate: function() {
+                var date = new Date();
+                return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+            }(),
         };
     }
     _handleGenderChange(event, index, value) {
@@ -79,7 +84,11 @@ export default class Slides extends React.Component {
         if (this.state.steps > this._motions.length) return;
         else if (this.state.steps + 1 === this._motions.length) {
             localStorage.setItem('basic',
-                `{"gender": "${this.state.gender}", "current": "${this.state.current}", "target": "${this.state.target}"}`);
+                `{"gender": "${this.state.gender}", 
+                "current": "${this.state.current}", 
+                "target": "${this.state.target}",
+                "startDate": "${this.state.startDate}"}`
+            );
             let date = (() => {
                 let date = new Date();
                 return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
